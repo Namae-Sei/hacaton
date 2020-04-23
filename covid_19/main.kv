@@ -1,0 +1,166 @@
+#:import NoTransition kivy.uix.screenmanager.NoTransition
+#:import Window kivy.core.window.Window
+#:import IconLeftWidget kivymd.uix.list.IconLeftWidget
+#:import toast kivymd.toast.toast
+
+
+<ItemBackdropFrontLayer@TwoLineAvatarListItem>
+    icon: "android"
+
+    IconLeftWidget:
+        icon: root.icon
+
+
+
+
+
+
+<ItemBackdropBackLayer>
+    backdrop: root.backdrop
+    backlayer: root.backlayer
+    size_hint_y: None
+    height: self.minimum_height
+    spacing: "10dp"
+
+    canvas:
+        Color:
+            rgba:
+                root.theme_cls.primary_dark if root.selected_item \
+                else root.theme_cls.primary_color
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+
+    MDIconButton:
+        icon: root.icon
+        theme_text_color: "Custom"
+        text_color: 1, 1, 1, .5 if not root.selected_item else 1, 1, 1, 1
+
+    MDLabel:
+        text: root.text
+        color: 1, 1, 1, 1 if not root.selected_item else 1, 1, 1, .2
+
+
+
+<MyBackdropFrontLayerFaq@ScrollView>
+    backdrop: None
+    backlayer: None
+    text_input: text_input
+    label_widget: label
+
+    GridLayout:
+        rows: 3
+        padding: "5dp"
+
+        MDTextField:
+            id: text_input
+            size_hint: 1, 0.3
+            font_size: "20dp"
+            hint_text: 'Введите вопрос'
+
+        MDLabel:
+            id: label
+            text: 'Задай вопрос о коронавирусе'
+            font_size: "14dp" if len(self.text) > 500 else "40dp" if len(self.text) < 50 else str((742.3 - len(self.text)) / 17.3) + "dp"
+            halign: "center"
+            valign: "middle"
+            text_size: self.size
+            font_name: "RobotoThin"
+
+        MDFillRoundFlatButton:
+            size_hint: 0.4, 0.2
+            pos_hint: {'center_x': 0.5, 'y': 0.1}
+            text: 'Спросить'
+            font_size: "30dp"
+            font_name: "RobotoLight"
+
+            on_release:
+                root.ask_question()
+
+<MyBackdropBackLayer@ScreenManager>
+    transition: NoTransition()
+    backdrop: root.backdrop
+    backlayer: root.backlayer
+
+    Screen:
+        name: "first screen"
+
+        ScrollView
+
+            GridLayout:
+                size_hint_y: None
+                height: self.minimum_height
+                cols: 1
+                padding: "5dp"
+
+                ItemBackdropBackLayer:
+                    backdrop: root.backdrop
+                    icon: "atom-variant"
+                    text: "Ask question"
+                ItemBackdropBackLayer:
+                    backlayer: root.backlayer
+                    icon: "book-outline"
+                    text: "About"
+                ItemBackdropBackLayer:
+                    icon: "location-exit"
+                    text: "Exit"
+
+    Screen:
+        name: "second screen"
+        ScrollView
+            GridLayout:
+                rows: 2
+                padding: "20dp"
+                ItemBackdropFrontLayer:
+                    size_hint: 1, 0.1
+                    text: "Press it"
+                    secondary_text: "to Back"
+                    icon: "chevron-left-circle-outline"
+                    theme_text_color: "Custom"
+                    text_color: 1, 1, 1, .5
+                    on_release:
+                        root.backlayer.current = "first screen"
+                MDLabel:
+                    theme_text_color: "Custom"
+                    text_color: 1, 1, 1, 1
+                    font_size: "25dp"
+                    font_name: "RobotoThin"
+                    text: 'Как это работает?\n1. Получаем текст вопроса от пользователя\n2. Лемматизируем все слова в тексте пользователя\n3. Сравниваем полученный текст со всеми лемматизированными вопросами из базы знаний (расстояние Левенштейна)\n4. Выбираем наиболее «похожий» вопрос из базы знаний\n5. Отправляем ответ на выбранный вопрос пользователю.'
+                    halign: "left"
+                    valign: "top"
+                    text_size: self.size
+
+<ItemRoundBackdropBackLayerOfSecondScreen@BoxLayout>
+    size_hint_y: None
+    height: "40dp"
+    spacing: "25dp"
+    text: ""
+
+    MDCheckbox:
+        group: "size"
+        size_hint: None, None
+        size: "30dp", "30dp"
+        pos_hint: {"center_y": .5}
+        selected_color: 1, 1, 1, 1
+
+    MDLabel:
+        text: root.text
+        color: 1, 1, 1, .7
+
+<StartApp>
+
+    MDBackdrop:
+        id: backdrop
+        left_action_items: [["menu", lambda x: self.open()]]
+        title: app.title
+        header_text: "Covid-19"
+        close_icon: "close-outline"
+        MDBackdropFrontLayer:
+            MyBackdropFrontLayerFaq:
+                backdrop: backdrop
+                backlayer: backlayer
+        MDBackdropBackLayer:
+            MyBackdropBackLayer:
+                backdrop: backdrop
+                id: backlayer
+                backlayer: backlayer
